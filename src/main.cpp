@@ -3,6 +3,7 @@
 #include <vector>
 #include <chrono>
 #include <Maze.h>
+#include "Utils.h"
 using namespace std;
 using namespace chrono;
 
