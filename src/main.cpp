@@ -1,52 +1,42 @@
 #include <iostream>
 #include <vector>
 #include "../include/Maze.h"
+#include "../include/Graph.h"
+#include "../include/DS.h"
 
 using namespace std;
 
-// Check if cell is valid
-bool isValidCell(int x, int y, int N, vector<vector<int>>& grid) {
-    return x >= 0 && x < N && y >= 0 && y < N && grid[x][y] == 0;
-}
-
-// Get valid neighbors
-vector<pair<int,int>> neighbors(int x, int y, int N, vector<vector<int>>& grid) {
-    vector<pair<int,int>> result;
-    vector<pair<int,int>> dirs = {{0,1},{1,0},{0,-1},{-1,0}};
-    for (auto [dx,dy] : dirs) {
-
-        int nx = x + dx, ny = y + dy;
-        if (isValidCell(nx, ny, N, grid))
-            result.push_back({nx, ny});
-    }
-    return result;
-}
-
-// Print path on maze
-void printPath(vector<pair<int,int>> path, vector<vector<int>> grid) {
-    for (auto [x,y] : path) grid[x][y] = 2; // mark path
-    for (auto &row : grid) {
-        for (auto cell : row) {
-            if (cell == 1) cout << "#";
-            else if (cell == 2) cout << "*";
-            else cout << ".";
-        }
-        cout << "\n";
-    }
-}
-
 int main() {
-    int N = 11; // odd numbers recommended for DFS maze
+    int N = 11;
     Maze maze(N);
     maze.generateMaze();
     maze.printMaze();
 
-    // Test neighbors function
-    auto grid = maze.getGrid();
-    auto neigh = neighbors(0,0,N,grid);
-    cout << "\nNeighbors of (0,0): ";
-    for (auto [x,y] : neigh) cout << "(" << x << "," << y << ") ";
+    // ---------- Build Graph ----------
+    Graph g(N);
+    g.buildFromMaze(maze.getGrid());
+    cout << "\nGraph built. Neighbors of (0,0): ";
+    for(auto [x,y] : g.neighbors(0,0)) cout << "(" << x << "," << y << ") ";
     cout << "\n";
+
+    // ---------- Test BFSQueue ----------
+    BFSQueue q;
+    q.push({0,0});
+    auto q_front = q.pop();
+    cout << "BFSQueue front: (" << q_front.first << "," << q_front.second << ")\n";
+
+    // ---------- Test DFSStack ----------
+    DFSStack s;
+    s.push({0,0});
+    auto s_top = s.pop();
+    cout << "DFSStack top: (" << s_top.first << "," << s_top.second << ")\n";
+
+    // ---------- Test MinHeap ----------
+    MinHeap h;
+    h.push({0,0,5}); // f = 5
+    h.push({1,1,3}); // f = 3
+    Node n = h.pop();
+    cout << "MinHeap top: (" << n.x << "," << n.y << ") f=" << n.f << "\n";
 
     return 0;
 }
