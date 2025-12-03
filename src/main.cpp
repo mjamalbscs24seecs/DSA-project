@@ -1,42 +1,59 @@
+#include "BFS.h"
 #include <iostream>
 #include <vector>
-#include "../include/Maze.h"
-#include "../include/Graph.h"
-#include "../include/DS.h"
-
+#include <chrono>
+#include <Maze.h>
 using namespace std;
+using namespace chrono;
 
 int main() {
-    int N = 11;
+    // Test case 1: 3x3
+    int N=3;
     Maze maze(N);
     maze.generateMaze();
-    maze.printMaze();
-
-    // ---------- Build Graph ----------
     Graph g(N);
     g.buildFromMaze(maze.getGrid());
-    cout << "\nGraph built. Neighbors of (0,0): ";
-    for(auto [x,y] : g.neighbors(0,0)) cout << "(" << x << "," << y << ") ";
-    cout << "\n";
 
-    // ---------- Test BFSQueue ----------
-    BFSQueue q;
-    q.push({0,0});
-    auto q_front = q.pop();
-    cout << "BFSQueue front: (" << q_front.first << "," << q_front.second << ")\n";
+    cout << "Maze ("<<N<<"x"<<N<<")\n";
+    maze.printMaze();
 
-    // ---------- Test DFSStack ----------
-    DFSStack s;
-    s.push({0,0});
-    auto s_top = s.pop();
-    cout << "DFSStack top: (" << s_top.first << "," << s_top.second << ")\n";
+    BFS bfs(g,N);
+    vector<pair<int,int>> visitedOrder;
+    int expansions;
+    auto start = high_resolution_clock::now();
+    auto path = bfs.run({0,0},{N-1,N-1},visitedOrder, expansions);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start).count();
 
-    // ---------- Test MinHeap ----------
-    MinHeap h;
-    h.push({0,0,5}); // f = 5
-    h.push({1,1,3}); // f = 3
-    Node n = h.pop();
-    cout << "MinHeap top: (" << n.x << "," << n.y << ") f=" << n.f << "\n";
+    cout << "\nBFS visited order: ";
+    for(auto [x,y]: visitedOrder) cout << "("<<x<<","<<y<<") ";
+    cout << "\nNumber of expansions: " << expansions;
+    cout << "\nPath length: " << path.size();
+    cout << "\nExecution time: " << duration << " microseconds";
+
+    cout << "\nPath:\n";
+    printPath(path, maze.getGrid());
+
+    // Test case 2: 5x5
+    N=5;
+    Maze maze2(N);
+    maze2.generateMaze();
+    Graph g2(N);
+    g2.buildFromMaze(maze2.getGrid());
+
+    BFS bfs2(g2,N);
+    visitedOrder.clear();
+    start = high_resolution_clock::now();
+    path = bfs2.run({0,0},{N-1,N-1},visitedOrder, expansions);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<microseconds>(stop - start).count();
+
+    cout << "\n\nMaze ("<<N<<"x"<<N<<")\n";
+    maze2.printMaze();
+    cout << "\nNumber of expansions: " << expansions;
+    cout << "\nPath length: " << path.size();
+    cout << "\nExecution time: " << duration << " microseconds\n";
+    printPath(path, maze2.getGrid());
 
     return 0;
 }
