@@ -12,6 +12,13 @@ vector<pair<int,int>> DFS::run(pair<int,int> start, pair<int,int> goal,
     vector<vector<bool>> visited(N, vector<bool>(N,false));
     vector<vector<pair<int,int>>> parent(N, vector<pair<int,int>>(N, {-1,-1}));
 
+    // Handle trivial start==goal case early
+    if(start == goal){
+        visitedOrder.push_back(start);
+        expansions = 1;
+        return {start};
+    }
+
     s.push(start);
     parent[start.first][start.second] = {-1,-1}; // start has no parent
     expansions = 0;

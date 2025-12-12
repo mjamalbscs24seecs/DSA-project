@@ -27,6 +27,11 @@ void AStar::reconstructPath(
         curr = parent[curr];
     }
 
+    // push the start node (the first with no recorded parent)
+    int x = curr / 100000;
+    int y = curr % 100000;
+    outPath.push_back({x, y});
+
     std::reverse(outPath.begin(), outPath.end());
 }
 
@@ -40,6 +45,10 @@ std::vector<std::pair<int,int>> AStar::run(
 
     int sx = start.first, sy = start.second;
     int gx = goal.first, gy = goal.second;
+
+    if (sx == gx && sy == gy) {
+        return {start};
+    }
 
     std::vector<std::vector<int>> gCost(
         maze.rows,
