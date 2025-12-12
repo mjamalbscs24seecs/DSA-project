@@ -114,7 +114,7 @@ static void writeResult(ofstream &out, int n, const BenchResult &r) {
 }
 
 int main() {
-    vector<int> sizes = {20, 40, 60, 80};
+    vector<int> sizes = {100, 200, 400};
     const int runs = 3;
 
     ofstream out("day8_results.csv");
