@@ -37,7 +37,9 @@ static AlgoResult runBFS(Maze &maze, pair<int,int> start, pair<int,int> goal) {
 }
 
 static AlgoResult runAStar(Maze &maze, pair<int,int> start, pair<int,int> goal) {
-    AStar astar(maze);
+    Graph g(maze.rows);
+    g.buildFromMaze(maze.grid);
+    AStar astar(maze, g);
     auto path = astar.run(start, goal);
     return {"A*", static_cast<int>(path.size()), astar.expansions, !path.empty()};
 }

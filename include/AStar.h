@@ -12,7 +12,7 @@
 class AStar {
 private:
     Maze& maze;
-    Graph graph;
+    Graph& graph;
 
     struct Node {
         int x, y;
@@ -40,7 +40,7 @@ public:
     int expansions = 0;
     int opensPushed = 0;
 
-    AStar(Maze& m);
+    AStar(Maze& m, Graph& g);
 
     std::vector<std::pair<int,int>> run(
         std::pair<int,int> start = {0,0},

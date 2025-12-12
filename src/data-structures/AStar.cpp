@@ -5,9 +5,7 @@
 #include <algorithm>
 #include <limits>
 
-AStar::AStar(Maze& m) : maze(m), graph(m.rows) {
-    graph.buildFromMaze(maze.grid);
-}
+AStar::AStar(Maze& m, Graph& g) : maze(m), graph(g) {}
 
 int AStar::manhattan(int x1, int y1, int x2, int y2) {
     return abs(x1 - x2) + abs(y1 - y2);

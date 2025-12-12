@@ -94,7 +94,9 @@ static BenchResult benchAStar(Maze &maze, int runs) {
     double eSum = 0.0;
     bool ok = true;
     for (int i = 0; i < runs; ++i) {
-        AStar astar(maze);
+        Graph g(maze.rows);
+        g.buildFromMaze(maze.grid);
+        AStar astar(maze, g);
         auto t0 = chrono::high_resolution_clock::now();
         auto path = astar.run({0,0}, {maze.rows - 1, maze.cols - 1});
         auto t1 = chrono::high_resolution_clock::now();
