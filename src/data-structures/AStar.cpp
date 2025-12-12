@@ -1,85 +1,106 @@
 #include "AStar.h"
-#include <cmath>
-#include <limits>
+#include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <algorithm>
-using namespace std;
+#include <limits>
 
-AStar::AStar(const Graph& graph, int n) : g(graph), N(n) {}
-
-int AStar::heuristic(int x, int y, int gx, int gy) {
-    return abs(x - gx) + abs(y - gy);     // Manhattan distance
+AStar::AStar(Maze& m) : maze(m), graph(m.rows) {
+    graph.buildFromMaze(maze.grid);
 }
 
-vector<pair<int,int>> AStar::run(
-    pair<int,int> start,
-    pair<int,int> goal,
-    vector<pair<int,int>>& visitedOrder,
-    int& expansions,
-    vector<int>& fValuesLog
+int AStar::manhattan(int x1, int y1, int x2, int y2) {
+    return abs(x1 - x2) + abs(y1 - y2);
+}
+
+void AStar::reconstructPath(
+    std::unordered_map<long long, long long>& parent,
+    int ex, int ey,
+    std::vector<std::pair<int,int>>& outPath
 ) {
-    expansions = 0;
-    visitedOrder.clear();
-    fValuesLog.clear();
+    long long curr = hash(ex, ey);
 
-    int total = N * N;
+    while (parent.count(curr)) {
+        int x = curr / 100000;
+        int y = curr % 100000;
+        outPath.push_back({x, y});
+        curr = parent[curr];
+    }
 
-    vector<int> gCost(total, INT_MAX);
-    vector<bool> closed(total, false);
-    vector<int> parent(total, -1);
+    std::reverse(outPath.begin(), outPath.end());
+}
 
-    auto encode = [&](int x, int y){ return x*N + y; };
-    auto decode = [&](int id){ return make_pair(id/N, id%N); };
-
-    int s = encode(start.first, start.second);
-    int t = encode(goal.first, goal.second);
-
-    gCost[s] = 0;
-
-    // priority queue: (f, node)
-    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+std::vector<std::pair<int,int>> AStar::run(
+    std::pair<int,int> start,
+    std::pair<int,int> goal
+) {
+    if (goal.first == -1) {
+        goal = {maze.rows - 1, maze.cols - 1};
+    }
 
     int sx = start.first, sy = start.second;
     int gx = goal.first, gy = goal.second;
 
-    pq.push({ heuristic(sx,sy,gx,gy), s });
+    std::vector<std::vector<int>> gCost(
+        maze.rows,
+        std::vector<int>(maze.cols, std::numeric_limits<int>::max())
+    );
 
-    while(!pq.empty()) {
-        auto [f, u] = pq.top();
+    std::priority_queue<
+        Node,
+        std::vector<Node>,
+        std::greater<Node>
+    > pq;
+
+    std::unordered_map<long long, long long> parent;
+    std::vector<std::vector<bool>> closed(
+        maze.rows, std::vector<bool>(maze.cols, false)
+    );
+
+    gCost[sx][sy] = 0;
+    pq.push({sx, sy, 0, manhattan(sx, sy, gx, gy), manhattan(sx, sy, gx, gy)});
+    opensPushed++;
+
+    expansions = 0;
+
+    while (!pq.empty()) {
+        Node curr = pq.top();
         pq.pop();
 
-        if (closed[u]) continue;
-        closed[u] = true;
+        int x = curr.x;
+        int y = curr.y;
 
+        if (closed[x][y]) continue;
+        closed[x][y] = true;
         expansions++;
-        visitedOrder.push_back(decode(u));
-        fValuesLog.push_back(f);
 
-        if (u == t) {
-            // reconstruct path
-            vector<pair<int,int>> path;
-            while(u != -1) {
-                path.push_back(decode(u));
-                u = parent[u];
-            }
-            reverse(path.begin(), path.end());
+        if (x == gx && y == gy) {
+            std::vector<std::pair<int,int>> path;
+            reconstructPath(parent, gx, gy, path);
             return path;
         }
 
-        auto neighbors = g.getAdjList()[u];
-        for (auto [vx, vy] : neighbors) {
-            int v = encode(vx,vy);
-            if (closed[v]) continue;
+        for (auto& nb : graph.neighbors(x, y)) {
+            int nx = nb.first;
+            int ny = nb.second;
 
-            int newCost = gCost[u] + 1; // uniform edges
+            if (maze.grid[nx][ny] == 1) continue;
+            if (closed[nx][ny]) continue;
 
-            if (newCost < gCost[v]) {
-                gCost[v] = newCost;
-                parent[v] = u;
+            int tentative_g = gCost[x][y] + 1;
 
-                int h = heuristic(vx, vy, gx, gy);
-                pq.push({ newCost + h, v });
+            if (tentative_g < gCost[nx][ny]) {
+                gCost[nx][ny] = tentative_g;
+                parent[hash(nx, ny)] = hash(x, y);
+
+                int h = manhattan(nx, ny, gx, gy);
+                int f = tentative_g + h;
+
+                pq.push({nx, ny, tentative_g, h, f});
+                opensPushed++;
+
+                // debug print
+                // std::cout << "PUSH (" << nx << "," << ny << ") f=" << f << "\n";
             }
         }
     }

@@ -1,40 +1,47 @@
 #include "Maze.h"
-#include <iostream>
-#include <algorithm>
-#include <random>
-#include <ctime>
+#include <cstdlib>
 
-Maze::Maze(int size) : N(size) {
-    grid.resize(N, vector<int>(N, 1)); // initially all walls
+Maze::Maze(int r, int c) : rows(r), cols(c) {
+    grid = vector<vector<int>>(rows, vector<int>(cols, 0));
 }
 
-// Randomized DFS
-void Maze::dfsMaze(int x, int y) {
-    grid[x][y] = 0; // mark as open
-    vector<pair<int,int>> directions = {{0,1},{1,0},{0,-1},{-1,0}}; // R,D,L,U
-    shuffle(directions.begin(), directions.end(), default_random_engine(time(0)));
-
-    for (auto [dx, dy] : directions) {
-        int nx = x + dx*2; // skip 1 to leave wall between cells
-        int ny = y + dy*2;
-        if (nx >= 0 && nx < N && ny >= 0 && ny < N && grid[nx][ny] == 1) {
-            grid[x + dx][y + dy] = 0; // remove wall
-            dfsMaze(nx, ny);
+void Maze::generateRandom() {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            // 0 = open, 1 = wall
+            grid[i][j] = (rand() % 100 < 25) ? 1 : 0;
         }
     }
+    grid[0][0] = 0;
+    grid[rows - 1][cols - 1] = 0;
 }
 
-void Maze::generateMaze() {
-    int startX = 0, startY = 0;
-    dfsMaze(startX, startY);
+bool Maze::isOpen(int r, int c) const {
+    return r >= 0 && c >= 0 && r < rows && c < cols && grid[r][c] == 0;
 }
 
-void Maze::printMaze() {
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++)
-            cout << (grid[i][j] == 1 ? '#' : '.');
+void Maze::printMaze() const {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            cout << (grid[i][j] == 0 ? "." : "#") << " ";
+        }
         cout << "\n";
     }
 }
 
-vector<vector<int>>& Maze::getGrid() { return grid; }
+void Maze::printPath(const vector<pair<int,int>>& path) const {
+    vector<vector<char>> disp(rows, vector<char>(cols, '.'));
+
+    for (auto &p : path) disp[p.first][p.second] = '*';
+
+    disp[0][0] = 'S';
+    disp[rows-1][cols-1] = 'G';
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 1) cout << "# ";
+            else cout << disp[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}

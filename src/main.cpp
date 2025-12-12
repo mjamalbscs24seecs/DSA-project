@@ -1,42 +1,38 @@
-#include "DFS.h"
-#include "BFS.h"
+#include <iostream>
 #include "Maze.h"
 #include "Graph.h"
-#include "DS.h"
-#include "Utils.h"
-#include <iostream>
-#include <vector>
-#include <chrono>
-using namespace std;
-using namespace chrono;
+#include "DFS.h"
+#include "AStar.h"
 
 int main() {
-    int N = 10;
-    Maze maze(N);
-    maze.generateMaze();
-    Graph g(N);
-    g.buildFromMaze(maze.getGrid());
-
-    cout << "Maze ("<<N<<"x"<<N<<")\n";
+    // Create a maze
+    Maze maze(10, 10);
+    maze.generateRandom();
+    
+    std::cout << "Maze (" << maze.rows << "x" << maze.cols << ")\n";
     maze.printMaze();
 
-    DFS dfs(g,N);
-    vector<pair<int,int>> visitedOrder;
-    int expansions;
+    // Build graph representation once for graph-based searches
+    Graph graph(maze.rows);
+    graph.buildFromMaze(maze.grid);
 
-    auto start = high_resolution_clock::now();
-    auto path = dfs.run({0,0},{N-1,N-1},visitedOrder, expansions);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start).count();
+    // -------------------------
+    // DFS TEST
+    // -------------------------
+    std::cout << "\n=== DFS TEST ===\n";
+    DFS dfs(graph, maze.rows);
+    vector<pair<int,int>> dfsVisited;
+    int dfsExpansions = 0;
+    auto dfsPath = dfs.run({0,0}, {maze.rows - 1, maze.cols - 1}, dfsVisited, dfsExpansions);
+    maze.printPath(dfsPath);
 
-    cout << "\nDFS visited order: ";
-    for(auto [x,y]: visitedOrder) cout << "("<<x<<","<<y<<") ";
-    cout << "\nNumber of expansions: " << expansions;
-    cout << "\nPath length: " << path.size();
-    cout << "\nExecution time: " << duration << " microseconds";
-
-    cout << "\nPath:\n";
-    printPath(path, maze.getGrid());
+    // -------------------------
+    // A* TEST
+    // -------------------------
+    std::cout << "\n=== A* TEST ===\n";
+    AStar astar(maze);
+    auto aPath = astar.run();
+    maze.printPath(aPath);
 
     return 0;
 }
