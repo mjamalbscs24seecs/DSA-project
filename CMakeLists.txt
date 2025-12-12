@@ -22,3 +22,10 @@ target_link_libraries(day7 core)
 
 add_executable(day8 tests/day8.cpp)
 target_link_libraries(day8 core)
+
+option(ENABLE_SFML "Build SFML visualization tool" OFF)
+if (ENABLE_SFML)
+    find_package(SFML 3 CONFIG REQUIRED COMPONENTS Graphics Window System)
+    add_executable(visualize_sfml src/visualize_sfml.cpp)
+    target_link_libraries(visualize_sfml core SFML::Graphics SFML::Window SFML::System)
+endif()

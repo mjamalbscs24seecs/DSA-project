@@ -1,0 +1,7 @@
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/core.dir
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/maze_solver.dir
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/day7.dir
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/day8.dir
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/visualize_sfml.dir
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/edit_cache.dir
+C:/Users/PMLS/OneDrive/Desktop/DSA-project/build-mingw/CMakeFiles/rebuild_cache.dir

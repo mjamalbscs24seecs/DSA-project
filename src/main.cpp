@@ -6,6 +6,7 @@
 #include "Graph.h"
 #include "Solver.h"
 
+// Small struct to keep CLI inputs together.
 struct CliArgs {
     int n{};
     int sx{}, sy{}, gx{}, gy{};
@@ -13,6 +14,7 @@ struct CliArgs {
 };
 
 static void printUsage() {
+    // Quick reminder for expected args.
     std::cerr << "Usage: ./maze_solver N startX startY goalX goalY --algo BFS|DFS|A*\n";
 }
 
@@ -22,6 +24,7 @@ static std::string normalizeAlgo(std::string in) {
         if (c == '*') continue;
         out.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
     }
+    if (out == "A") out = "ASTAR";
     return out;
 }
 

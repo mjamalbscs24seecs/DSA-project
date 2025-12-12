@@ -1,0 +1,2 @@
+C:\mingw\msys64\ucrt64\bin\ar.exe qc libcore.a "CMakeFiles/core.dir/src/data-structures/Maze.cpp.obj" "CMakeFiles/core.dir/src/data-structures/Graph.cpp.obj" "CMakeFiles/core.dir/src/data-structures/BFS.cpp.obj" "CMakeFiles/core.dir/src/data-structures/DFS.cpp.obj" "CMakeFiles/core.dir/src/data-structures/AStar.cpp.obj" CMakeFiles/core.dir/src/Solver.cpp.obj
+C:\mingw\msys64\ucrt64\bin\ranlib.exe libcore.a
